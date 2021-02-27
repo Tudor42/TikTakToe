@@ -9,44 +9,57 @@ class Board:
       [0, 0, 0], 
       [0, 0, 0]
     ]
-    self.lineswidth = 2
+    self.lineswidth = 5
 
   def update(self, turn, surfaceW, surfaceH, mouseposX, mouseposY):
     if(turn == 1):
-      self.putO(int(mouseposY/(surfaceH/3)),int(mouseposX/(surfaceW/3)))
+      if self.putO(int(mouseposY/(surfaceH/3)),int(mouseposX/(surfaceW/3))):
+        return True
     if(turn == 2):
-      self.putX(int(mouseposY/(surfaceH/3)),int(mouseposX/(surfaceW/3)))
+      if self.putX(int(mouseposY/(surfaceH/3)),int(mouseposX/(surfaceW/3))):
+        return True
+    return False
 
   def draw(self, surface, surfaceW, surfaceH):
-    stepW = (surfaceW-self.lineswidth)/3
+    stepW = (surfaceW)/3
     for i in range(5):
       pygame.draw.line(surface, color, (i*stepW, 0), (i*stepW, surfaceH), self.lineswidth)
-    stepH = (surfaceH-self.lineswidth)/3
+    stepH = (surfaceH)/3
     for i in range(5):
       pygame.draw.line(surface, color, (0, i*stepH), (surfaceW, i*stepH), self.lineswidth)
     for i in range(3):
       for j in range(3):
         if self.board[i][j]==1:
-          pygame.draw.circle(surface, (255, 255, 255), (i*stepH+stepH/2, j*stepW+stepW/2), stepH/2, self.lineswidth)
+          pygame.draw.circle(surface, (255, 255, 255), (i*stepH+stepH/2, j*stepW+stepW/2), (stepH-self.lineswidth)/2, self.lineswidth)
+        if self.board[i][j]==2:
+          pygame.draw.line(surface, (255, 255, 255), (stepH*i+self.lineswidth, stepW*j+self.lineswidth), (stepH*(i+1)-self.lineswidth, stepW*(j+1)-self.lineswidth), self.lineswidth)
+          pygame.draw.line(surface, (255, 255, 255), (stepH*(i+1)-self.lineswidth, stepW*j+self.lineswidth), (stepH*i+self.lineswidth, stepW*(j+1)-self.lineswidth), self.lineswidth)
 
   def putO(self, x, y):
     if x>2 or x<0 or y>2 or y<0:
       print("Err: board \n func putO()")
-    else:
+    elif self.board[y][x]==0:
       self.board[y][x] = 1
+      return True
+    return False
 
   def putX(self, x, y):
     if x>3 or x<0 or y>3 or y<0:
       print("Err: board \n func putX()")
-    else:
+    elif self.board[y][x]==0:
       self.board[y][x] = 2
+      return True
+    return False
 
   def winnerChecker(self):
+    draw = True
     #check lines
     for j in range(3):
       winX = True
       winO = True
       for i in range(3):
+        if self.board[j][i] == 0:
+          draw = False
         if self.board[j][i] != 1:
           winO = False
         if self.board[j][i] != 2:
@@ -91,3 +104,6 @@ class Board:
       return 1
     if winX:
       return 2
+    if draw:
+      return 0
+    return -1 

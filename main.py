@@ -1,59 +1,34 @@
 import pygame
 import sys
-from board import Board
+from gameloop import Game
+from events import Events
 
-class Tetris:
+class Tik_Tak_Toe:
   def __init__(self):
     pygame.display.init()
-    self.screenwidth = 600
-    self.screenheight = 600
+    self.screenwidth = 800
+    self.screenheight = 800
     self.screen = pygame.display.set_mode((self.screenwidth, self.screenheight))
-    self.mousekeys = pygame.mouse.get_pressed()
-    self.keys = pygame.key.get_pressed()
-    self.board = Board()
-
-  def displayWinner(self):
-    return
-
-  def gamerestart(self):
-    self.board = Board()
-
-  def draw(self):
-    self.board.draw(self.screen, self.screenwidth, self.screenheight)
+    self.events = Events()
 
   def keysHandle(self):
-    if self.keys[pygame.K_a]:
-      self.gamerestart()
-    elif self.mousekeys[0]:
-      self.board.update(1, self.screenwidth, self.screenheight, self.mousePos[0], self.mousePos[1])
-    else:
-      self.screen.fill((0,0,0))
+    if self.events.keys[pygame.K_a]:
+      self.game = Game(self.screen, self.screenwidth, self.screenheight, self.events)
+      print(self.game.run())
+      return
+    if self.events.keys[pygame.K_q]:
+      return
 
   def update(self):
-    self.draw()
-    if self.board.winnerChecker() == 1:
-      self.displayWinner()
-      self.gamerestart()
+    self.keysHandle()
+    self.screen.fill((0,0,0))
     pygame.display.flip()
-
-  def eventsHandle(self):
-    events = pygame.event.get()
-    for event in events:
-      if event.type == pygame.QUIT:
-        sys.exit()
-      if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-        self.keys = pygame.key.get_pressed()
-      if event.type == pygame.MOUSEMOTION:
-        self.mousePos = pygame.mouse.get_pos()
-      if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
-        self.mousekeys = pygame.mouse.get_pressed()
-      self.keysHandle()
 
   def run(self):
     while(True):
-      self.eventsHandle()
+      self.events.update()
       self.update()
 
 if __name__=="__main__":
-  game = Tetris()
+  game = Tik_Tak_Toe()
   game.run()
