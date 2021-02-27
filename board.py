@@ -1,4 +1,6 @@
 import pygame
+from pygame import gfxdraw
+from math import sqrt
 
 color = (30, 30, 200)
 
@@ -22,34 +24,61 @@ class Board:
 
   def draw(self, surface, surfaceW, surfaceH):
     stepW = (surfaceW)/3
-    for i in range(5):
+    for i in range(4):
       pygame.draw.line(surface, color, (i*stepW, 0), (i*stepW, surfaceH), self.lineswidth)
     stepH = (surfaceH)/3
-    for i in range(5):
+    for i in range(4):
       pygame.draw.line(surface, color, (0, i*stepH), (surfaceW, i*stepH), self.lineswidth)
     for i in range(3):
       for j in range(3):
         if self.board[i][j]==1:
-          pygame.draw.circle(surface, (255, 255, 255), (i*stepH+stepH/2, j*stepW+stepW/2), (stepH-self.lineswidth)/2, self.lineswidth)
+          #print((int(i*stepH+stepH/2), int(j*stepW+stepW/2)), surface, int(stepW), int(stepH))
+          self._drawO((i,j), surface, int(stepW), int(stepH))
         if self.board[i][j]==2:
-          pygame.draw.line(surface, (255, 255, 255), (stepH*i+self.lineswidth, stepW*j+self.lineswidth), (stepH*(i+1)-self.lineswidth, stepW*(j+1)-self.lineswidth), self.lineswidth)
-          pygame.draw.line(surface, (255, 255, 255), (stepH*(i+1)-self.lineswidth, stepW*j+self.lineswidth), (stepH*i+self.lineswidth, stepW*(j+1)-self.lineswidth), self.lineswidth)
-
+          self._drawX((i, j), surface, int(stepW), int(stepH))
   def putO(self, x, y):
-    if x>2 or x<0 or y>2 or y<0:
-      print("Err: board \n func putO()")
-    elif self.board[y][x]==0:
+    if x<3 and x>=0 and y<3 and y>=0 and self.board[y][x]==0:
       self.board[y][x] = 1
       return True
+    else:
+      print("Err: board \n func putO()")
     return False
 
   def putX(self, x, y):
-    if x>3 or x<0 or y>3 or y<0:
-      print("Err: board \n func putX()")
-    elif self.board[y][x]==0:
+    if x<3 and x>=0 and y<3 and y>=0 and self.board[y][x]==0:
       self.board[y][x] = 2
       return True
+    else:
+      print("Err: board \n func putX()")
     return False
+
+#draw functions copied from https://github.com/denis-svg/Tic-Tac-Toe/blob/main/client.py
+  def _drawO(self, pos, surface, square_width, square_height):
+    w = square_width
+    h = square_height
+    rx = square_width // 2 - int(0.15 * w)
+    ry = square_height // 2 - int(0.15 * h)
+    rx1 = rx - round(sqrt(2 * (int(0.22 * w) - int(0.15 * w)) ** 2))
+    ry1 = ry - round(sqrt(2 * (int(0.22 * h) - int(0.15 * h)) ** 2))
+    gfxdraw.aaellipse(surface, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry, (255, 255, 255))
+    gfxdraw.filled_ellipse(surface, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry,
+                               (255, 255, 255))
+    gfxdraw.aaellipse(surface, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
+    gfxdraw.filled_ellipse(surface, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
+
+  def _drawX(self, pos, surface, square_width, square_height):
+    w = square_width
+    h = square_height
+    points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.22 * h)),
+              (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.15 * h)),
+              (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.78 * h)),
+                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.85 * h))]
+    pygame.draw.polygon(surface, (255, 255, 255), points)
+    points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.78 * h)),
+                  (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.85 * h)),
+                  (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.22 * h)),
+                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
+    pygame.draw.polygon(surface, (255, 255, 255), points, 0)
 
   def winnerChecker(self):
     draw = True
